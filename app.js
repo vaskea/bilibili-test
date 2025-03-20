@@ -82,7 +82,7 @@ function encWbi(params, img_key, sub_key) {
     return query + '&w_rid=' + wbi_sign
 }
 
-function getVideoData() {
+async function getVideoData(fetchUrl) {
     // Get the current UNIX timestamp in seconds
     let currentTimestamp = Math.floor(Date.now() / 1000);
     // Add 3 days (3 days * 24 hours * 60 minutes * 60 seconds)
@@ -91,17 +91,20 @@ function getVideoData() {
     const cookieVal = `bili_ticket_expires=${futureTimestamp}; CURRENT_FNVAL=2000;`;
 
     // make a request and get the page with video source
-    axios.get('https://api.example.com/data', {
-        headers: {
-            'Cookie': cookieVal
-        }
-    })
-        .then(response => {
-            console.log(response.data);
-        })
-        .catch(error => {
-            console.error('Error:', error);
+    try {
+        // Make a request and get the page with video source
+        const response = await axios.get(fetchUrl, {
+            headers: {
+                'Cookie': cookieVal
+            }
         });
+
+        // Return the fetched HTML
+        return response.data;
+    } catch (error) {
+        console.error('Error:', error);
+        return null;  // You can also throw the error if you prefer
+    }
 }
 
 // Initialize the express app
@@ -112,14 +115,6 @@ app.use(express.json());
 
 // Endpoint to encrypt data
 app.post('/encrypt', async (req, res) => {
-    // const inputParams = req.body;
-    // console.log('input params received: ', inputParams);
-    //
-    // if (!inputParams) {
-    //     return res.status(400).json({ message: 'Data is required' });
-    // }
-
-
     const { url } = req.body;
     if (!url) {
         return res.status(400).json({ error: 'URL is required' });
@@ -131,13 +126,7 @@ app.post('/encrypt', async (req, res) => {
     const page = +parsedUrl.searchParams.get('page') || 1;
     const o = +parsedUrl.searchParams.get('o') || 42;
 
-
-    console.log('keyword', keyword);
-    console.log('page', page);
-    console.log('o', o);
-
     const qv_id = qv_id_fn.hee(32, "0-9a-zA-Z");
-    console.log('test', qv_id);
 
     // Create params for encryption and return fetch URL
     const inputParams = {
@@ -170,9 +159,10 @@ app.post('/encrypt', async (req, res) => {
     const img_key = web_keys.img_key, sub_key = web_keys.sub_key;
     const query = encWbi(inputParams, img_key, sub_key);
 
-    console.log('returning data: ', BASE_URL + query);
+    const fetchUrl = BASE_URL + query;
 
-    return res.status(200).json(query);
+    const data = await getVideoData(fetchUrl);
+    return res.status(200).json(data);
 });
 
 
