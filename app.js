@@ -149,7 +149,7 @@ app.post('/encrypt', async (req, res) => {
         qv_id: qv_id,
         source_tag: SOURCE_TAG,
         gaia_vtoken: GAIA_VTOKEN,
-        dynamic_offset: page * PAGE_SIZE,
+        dynamic_offset: o,
         page_exp: PAGE_EXP,
         web_location: WEB_LOCATION
     };
