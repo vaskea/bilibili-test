@@ -2,7 +2,7 @@ Example Postman
 
 POST http://localhost:3000/encrypt
 Body:
-{ "foo": 321, "bar": 514, "baz": 11111 }
+{ "url": "https://search.bilibili.com/all?keyword=tes&from_source=webtop_search&spm_id_from=333.1007&search_source=5&page=2&o=24" }
 
 Response:
-"bar=514&baz=11111&foo=321&wts=1741117669&w_rid=6acd17608830215a964dfa4995e07e30"
+Fetched html page with video urls
