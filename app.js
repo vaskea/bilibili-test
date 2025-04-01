@@ -172,7 +172,7 @@ app.post('/encrypt', async (req, res) => {
 
     console.log('returning data: ', BASE_URL + query);
 
-    return res.status(200).json(query);
+    return res.status(200).json(BASE_URL + query);
 });
 
 
